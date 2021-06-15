@@ -202,7 +202,7 @@ begin
   dac8568 : entity work.dac_inter8568
     port map(
       clk       => clk_aux,
-      reset     => dac8568_rst,
+      reset     => dac8568_rst_n,
       busy_8568 => dac8568_busy,
       start     => dac8568_start,
       ch        => dac8568_sel_ch,
