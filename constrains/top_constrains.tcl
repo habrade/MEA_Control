@@ -82,34 +82,33 @@ set_property IOSTANDARD  LVCMOS25  [get_ports DAC_DIN]
 set_property PACKAGE_PIN F19      [get_ports DAC_SYNC_N]
 set_property IOSTANDARD  LVCMOS25  [get_ports DAC_SYNC_N]
 
-set_property PACKAGE_PIN B15      [get_ports clk_REF_p]
-set_property IOSTANDARD  LVDS_25  [get_ports clk_REF_p]
-set_property PACKAGE_PIN A15      [get_ports clk_REF_n]
-set_property IOSTANDARD  LVDS_25  [get_ports clk_REF_n]
+#set_property PACKAGE_PIN F13      [get_ports clk_100Khz]   
+#set_property IOSTANDARD  LVCMOS25  [get_ports clk_100Khz]
 
-set_property PACKAGE_PIN B14      [get_ports clk_DFF_p]
-set_property IOSTANDARD  LVDS_25  [get_ports clk_DFF_p]
-set_property PACKAGE_PIN A14      [get_ports clk_DFF_n]
-set_property IOSTANDARD  LVDS_25  [get_ports clk_DFF_n]
+set_property PACKAGE_PIN G11      [get_ports SRAM_WE_FPGA]   
+set_property IOSTANDARD  LVCMOS25  [get_ports SRAM_WE_FPGA]
 
+set_property PACKAGE_PIN F10      [get_ports SRAM_D2_FPGA]
+set_property IOSTANDARD  LVCMOS25  [get_ports SRAM_D2_FPGA]
 
-set_property PACKAGE_PIN F14     [get_ports start_pad]
-set_property IOSTANDARD  LVCMOS25  [get_ports start_pad]
+set_property PACKAGE_PIN F14      [get_ports SRAM_D1_FPGA] 
+set_property IOSTANDARD  LVCMOS25  [get_ports SRAM_D1_FPGA]
 
-set_property PACKAGE_PIN F13      [get_ports trigger_pad]
-set_property IOSTANDARD  LVCMOS25  [get_ports trigger_pad]
+set_property PACKAGE_PIN C14      [get_ports mea_mark]
+set_property IOSTANDARD  LVCMOS25  [get_ports mea_mark]
 
-set_property PACKAGE_PIN F10      [get_ports enable_r_dff]
-set_property IOSTANDARD  LVCMOS25  [get_ports enable_r_dff]
+# mea scan ports
+set_property PACKAGE_PIN F13      [get_ports mea_speak]
+set_property IOSTANDARD  LVCMOS25  [get_ports mea_speak]
 
-set_property PACKAGE_PIN G11      [get_ports din_dff]
-set_property IOSTANDARD  LVCMOS25  [get_ports din_dff]
+set_property PACKAGE_PIN G12      [get_ports mea_start]
+set_property IOSTANDARD  LVCMOS25  [get_ports mea_start]
 
-set_property PACKAGE_PIN G12      [get_ports bit_0_cp]
-set_property IOSTANDARD  LVCMOS25  [get_ports bit_0_cp]
+set_property PACKAGE_PIN F12      [get_ports mea_clk]
+set_property IOSTANDARD  LVCMOS25  [get_ports mea_clk]
 
-set_property PACKAGE_PIN F12      [get_ports bit_1_cp]
-set_property IOSTANDARD  LVCMOS25  [get_ports bit_1_cp]
+set_property PACKAGE_PIN R22      [get_ports mea_reset]
+set_property IOSTANDARD  LVCMOS25  [get_ports mea_reset]
 
 
 # IPbus clock
@@ -118,16 +117,12 @@ create_generated_clock -name clk_125M -source [get_pins ipbus_infra/clocks/mmcm/
 
 # Other derived clocks
 create_generated_clock -name clk_aux -source [get_pins ipbus_infra/clocks/mmcm/CLKIN1] [get_pins ipbus_infra/clocks/mmcm/CLKOUT4]
-create_generated_clock -name clk_REF -source [get_pins inst_sca_control/mmcm2e_drp_gen[0].MMCME2_ADV_inst/CLKIN1] [get_pins inst_sca_control/mmcm2e_drp_gen[0].MMCME2_ADV_inst/CLKOUT0]
-create_generated_clock -name clk_DFF -source [get_pins inst_sca_control/mmcm2e_drp_gen[1].MMCME2_ADV_inst/CLKIN1] [get_pins inst_sca_control/mmcm2e_drp_gen[1].MMCME2_ADV_inst/CLKOUT0]
-create_generated_clock -name clk_div_0 -source [get_pins inst_freq_div/clkdiv[0]] -divide_by 64 -multiply_by 1 [get_pins inst_freq_div/clk[0]]
-create_generated_clock -name clk_div_1 -source [get_pins inst_freq_div/clkdiv[1]] -divide_by 64 -multiply_by 1 [get_pins inst_freq_div/clk[1]]
+create_generated_clock -name clk_MEA -source [get_pins mea_clocks/mmcm2e_drp_gen[0].MMCME2_ADV_inst/CLKIN1] [get_pins mea_clocks/mmcm2e_drp_gen[0].MMCME2_ADV_inst/CLKOUT0]
+create_generated_clock -name clk_div_0 -source [get_pins freq_div/clkdiv[0]] -divide_by 64 -multiply_by 1 [get_pins freq_div/clk[0]]
 
 set_false_path -through [get_pins ipbus_infra/clocks/rst_reg/Q]
 set_false_path -through [get_nets ipbus_infra/clocks/nuke_i]
 
 
 set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_aux]]
-set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_REF]]
-set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_DFF]]
-set_clock_groups -asynchronous -group [get_clocks clk_div_0] -group [get_clocks -include_generated_clocks [get_clocks clk_div_1]]
+set_clock_groups -asynchronous -group [get_clocks ipbus_clk] -group [get_clocks -include_generated_clocks [get_clocks clk_MEA]]

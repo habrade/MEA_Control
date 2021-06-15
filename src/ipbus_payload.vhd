@@ -36,21 +36,17 @@ entity ipbus_payload is
     dac8568_data_f : out std_logic_vector(15 downto 0);
     dac8568_data_g : out std_logic_vector(15 downto 0);
     dac8568_data_h : out std_logic_vector(15 downto 0);
-    -- SCA
+    -- MEA
     -- Control Port
-    start_pad      : out std_logic;
-    trigger_pad    : out std_logic;
-    enable_r_dff   : out std_logic;
-    din_dff        : out std_logic;
-    bit_0_cp       : out std_logic;
-    bit_1_cp       : out std_logic;
+    mea_start_scan : out std_logic;
+
     -- MMCM DRP Ports
-    locked         : in  std_logic_vector(N_DRP-1 downto 0);
-    rst_mmcm       : out std_logic_vector(N_DRP-1 downto 0);
-    drp_out        : out drp_wbus_array(N_DRP-1 downto 0);
-    drp_in         : in  drp_rbus_array(N_DRP-1 downto 0);
+    locked     : in  std_logic_vector(N_DRP-1 downto 0);
+    rst_mmcm   : out std_logic_vector(N_DRP-1 downto 0);
+    drp_out    : out drp_wbus_array(N_DRP-1 downto 0);
+    drp_in     : in  drp_rbus_array(N_DRP-1 downto 0);
     -- FREQ CTR
-    clk_ctr_in     : in  std_logic_vector(N_CLK-1 downto 0)
+    clk_ctr_in : in  std_logic_vector(N_CLK-1 downto 0)
     );
 
 end ipbus_payload;
@@ -96,7 +92,7 @@ begin
 
       clk => clk,
       rst => rst,
-      
+
       -- DAC8568  
       dac8568_busy => dac8568_busy,
 
@@ -114,7 +110,7 @@ begin
       dac8568_data_h => dac8568_data_h
       );
 
-  slave2 : entity work.ipbus_sca_device
+  slave2 : entity work.ipbus_mea_device
     generic map(
       N_DRP => N_DRP
       )
@@ -127,13 +123,8 @@ begin
       clk => clk,
       rst => rst,
 
-      -- SCA IO PORTS
-      start_pad    => start_pad,
-      trigger_pad  => trigger_pad,
-      enable_r_dff => enable_r_dff,
-      din_dff      => din_dff,
-      bit_0_cp     => bit_0_cp,
-      bit_1_cp     => bit_1_cp,
+      -- MEA IO PORTS
+      mea_start_scan => mea_start_scan,
 
       -- MMCM DRP Ports.
       locked   => locked,

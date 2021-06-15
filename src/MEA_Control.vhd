@@ -28,15 +28,18 @@ entity MEA_Control is port(
   DAC_DIN    : out std_logic;
   DAC_SYNC_N : out std_logic;
 
-  -- MEA
-  clk_MEA    : out std_logic;
-  --clk_MEA_n    : out std_logic;
-  start_pad    : out std_logic;
-  trigger_pad  : out std_logic;
-  enable_r_dff : out std_logic;
-  din_dff      : out std_logic;
-  bit_0_cp     : out std_logic;
-  bit_1_cp     : out std_logic);
+  -- MEA    
+  SRAM_WE_FPGA : out std_logic;
+  SRAM_D1_FPGA : out std_logic;
+  SRAM_D2_FPGA : out std_logic;
+
+  -- mea scan ports
+  mea_mark  : in  std_logic;
+  mea_start : out std_logic;
+  mea_speak : out std_logic;
+  mea_clk   : out std_logic;
+  mea_reset : out std_logic
+  );
 end MEA_Control;
 
 architecture rtl of MEA_Control is
@@ -50,29 +53,32 @@ architecture rtl of MEA_Control is
 
   -- DAC8568
   signal dac8568_busy                                                   : std_logic;
-  signal dac8568_start, dac8568_rst                                     : std_logic;
+  signal dac8568_start, dac8568_rst, dac8568_rst_n                      : std_logic;
   signal dac8568_sel_ch                                                 : std_logic_vector(7 downto 0);
   signal dac8568_data_a, dac8568_data_b, dac8568_data_c, dac8568_data_d : std_logic_vector(15 downto 0);
   signal dac8568_data_e, dac8568_data_f, dac8568_data_g, dac8568_data_h : std_logic_vector(15 downto 0);
+
+  -- MEA
+  signal mea_start_scan : std_logic;
+  signal clk100_en      : std_logic;
 
   -- MEA MMCM DRP
   constant N_DRP           : integer := 1;
   signal rst_mmcm          : std_logic_vector(N_DRP-1 downto 0);
   signal drp_m2s           : drp_wbus_array(N_DRP-1 downto 0);
   signal drp_s2m           : drp_rbus_array(N_DRP-1 downto 0);
-  signal clk_mea_o : std_logic;
+  signal clk_mea_o         : std_logic;
   signal mea_clocks_locked : std_logic_vector(N_DRP-1 downto 0);
 
 
   -- FREQ Counter
-  constant N_CLK              : integer := 1;
+  constant N_CLK     : integer := 1;
   signal clk_mea_div : std_logic_vector(N_CLK -1 downto 0);
 
   constant CLK_AUX_FREQ : real := 50.0;
 
-
   attribute mark_debug                      : string;
-  attribute mark_debug of clk_mea_o           : signal is "true";
+  attribute mark_debug of clk_mea_o         : signal is "true";
   attribute mark_debug of clk_mea_div       : signal is "true";
   attribute mark_debug of mea_clocks_locked : signal is "true";
 
@@ -110,8 +116,9 @@ begin
       ipb_out      => ipb_out
       );
 
-  leds(3 downto 2) <= mea_clocks_locked;
-  phy_rst          <= not phy_rst_e;
+  leds(2) <= mea_mark;
+  leds(3) <= mea_clocks_locked(0);
+  phy_rst <= not phy_rst_e;
 
 --      mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
 --      ip_addr <= X"c0a8c81" & dip_sw; -- 192.168.200.16+n
@@ -152,12 +159,7 @@ begin
       dac8568_data_g => dac8568_data_g,
       dac8568_data_h => dac8568_data_h,
       --MEA
-      start_pad      => start_pad,
-      trigger_pad    => trigger_pad,
-      enable_r_dff   => enable_r_dff,
-      din_dff        => din_dff,
-      bit_0_cp       => bit_0_cp,
-      bit_1_cp       => bit_1_cp,
+      mea_start_scan => mea_start_scan,
       -- MMCM DRP Ports
       locked         => mea_clocks_locked,
       rst_mmcm       => rst_mmcm,
@@ -167,7 +169,37 @@ begin
       clk_ctr_in     => clk_mea_div
       );
 
-  inst_dac_8568 : entity work.dac_inter8568
+  gen_clk100 : entity work.gen_clk100
+    port map(
+      clk       => clk_aux,
+      rst       => rst_aux,
+      clk100_en => clk100_en
+      );
+
+
+
+  pixel_mea : entity work.Pixel_MEA
+    port map(
+      clk       => clk_aux,
+      rst       => rst_aux,
+      clk100_en => clk100_en,
+      SRAM_WE   => SRAM_WE_FPGA,
+      SRAM_D1   => SRAM_D1_FPGA,
+      SRAM_D2   => SRAM_D2_FPGA
+      );
+
+  mea_scan : entity work.mea_scan
+    port map(
+      clk        => clk_aux,
+      rst        => rst_aux,
+      start_scan => mea_start_scan,
+      speak      => mea_speak,
+      start      => mea_start,
+      rst_out    => mea_reset
+      );
+
+  dac8568_rst_n <= not dac8568_rst;
+  dac8568 : entity work.dac_inter8568
     port map(
       clk       => clk_aux,
       reset     => dac8568_rst,
@@ -188,7 +220,7 @@ begin
       syn  => DAC_SYNC_N
       );
 
-  inst_mea_control : entity work.mea_clock
+  mea_clocks : entity work.mea_clocks
     generic map(
       N_DRP => N_DRP
       )
@@ -203,14 +235,14 @@ begin
       drp_in   => drp_m2s
       );
 
-  clk_mea <= clk_mea_o;
+  mea_clk <= clk_mea_o;
 
-  inst_freq_div : entity work.freq_ctr_div
+  freq_div : entity work.freq_ctr_div
     generic map(
       N_CLK => N_CLK
       )
     port map(
-      clk    => clk_mea_o,
+      clk(0) => clk_mea_o,
       clkdiv => clk_mea_div
       );
 
