@@ -27,7 +27,7 @@
 set_property BITSTREAM.GENERAL.COMPRESS TRUE [current_design]
 
 # System clock (200MHz)
-create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
+#create_clock -period 5.000 -name sysclk [get_ports sysclk_p]
 
 set_property PACKAGE_PIN V11 [get_ports rst]
 set_property IOSTANDARD LVCMOS15 [get_ports rst]
