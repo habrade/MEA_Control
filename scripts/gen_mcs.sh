@@ -2,7 +2,7 @@
 
 set -ex
 
-PRJ_NAME=mea-ipbus
+PRJ_NAME=MEA_Control
 TOP_NAME=MEA_Control
 IMPL="impl_1"
 
