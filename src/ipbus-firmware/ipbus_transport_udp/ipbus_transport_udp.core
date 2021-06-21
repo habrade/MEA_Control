@@ -1,0 +1,35 @@
+CAPI=2:
+name: ::ipbus_transport_udp
+description: IPbus transport UDP.
+
+filesets:
+  rtl:
+    files:
+      - udp_buffer_selector.vhd
+      - udp_build_arp.vhd
+      - udp_build_payload.vhd
+      - udp_build_ping.vhd
+      - udp_build_resend.vhd
+      - udp_build_status.vhd
+      - udp_byte_sum.vhd
+      - udp_clock_crossing_if.vhd
+      - udp_do_rx_reset.vhd
+      - udp_dualportram.vhd
+      - udp_dualportram_rx.vhd
+      - udp_dualportram_tx.vhd
+      - udp_if_flat.vhd
+      - udp_ipaddr_block.vhd
+      - udp_packet_parser.vhd
+      - udp_rarp_block.vhd
+      - udp_rxram_mux.vhd
+      - udp_rxram_shim.vhd
+      - udp_rxtransactor_if_simple.vhd
+      - udp_status_buffer.vhd
+      - udp_tx_mux.vhd
+      - udp_txtransactor_if_simple.vhd
+    file_type: vhdlSource-93
+
+targets:
+  default:
+    filesets:
+      - rtl

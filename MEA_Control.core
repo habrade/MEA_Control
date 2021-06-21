@@ -1,0 +1,45 @@
+CAPI=2:
+name: ::mea
+description: The firmware for controlling the MEA chip. 
+
+filesets:
+  rtl:
+    files:
+      - depend:
+        - src/dac8568/dac8568.core
+      - src/MEA_Control.vhd
+      - src/ipbus_decode_payload.vhd
+      - src/ipbus_fabric_inside_device.vhd
+      - src/ipbus_global_device.vhd
+      - src/ipbus_gmii_infra.vhd
+      - src/ipbus_payload.vhd
+    file_type: vhdlSource-2008
+
+  scripts:
+    files:
+      - scripts/gen_mcs.sh
+      - scripts/gen_mcs.tcl
+
+targets:
+  # The "default" target is special in FuseSoC and used in dependencies.
+  # The "&default" is a YAML anchor referenced later.
+  default: &default
+    filesets:
+      - rtl
+    toplevel: MEA_Control
+
+  # The "synth" target synthesizes the design. (It could have any name.)
+  synth:
+    <<: *default
+    description: Synthesize the design for a Nexys Video FPGA board
+    default_tool: vivado
+    tools:
+      vivado:
+        part: xc7k70tfbg676-2
+
+  mcs:
+    filesets:
+      - scripts
+      
+    
+

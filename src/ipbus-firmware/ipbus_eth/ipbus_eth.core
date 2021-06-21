@@ -1,0 +1,16 @@
+CAPI=2:
+name: ::IPbus_eth
+description: IPbus ethernet.
+
+filesets:
+  rtl:
+    files:
+      - emac_hostbus_decl.vhd:
+          is_include_fiue: true
+      - eth_7s_gmii.vhd
+    file_type: vhdlSource-93
+
+targets:
+  default:
+    filesets:
+      - rtl

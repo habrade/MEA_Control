@@ -1,0 +1,15 @@
+CAPI=2:
+name: ::mea_ipbus_infra
+description: The firmware for DAC8568.
+
+filesets:
+  rtl:
+    files:
+      - ipbus_util/clocks/clocks_7s_extphy.vhd
+    file_type: vhdlSource
+
+
+targets:
+  ipbus_gmii_core:
+    filesets:
+      - rtl

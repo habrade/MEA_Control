@@ -1,0 +1,24 @@
+CAPI=2:
+name: ::dac8568
+description: The firmware for DAC8568.
+
+filesets:
+  rtl:
+    files:
+      - dac_inter8568.v
+      - wr_inter.v
+    file_type: verilogSource
+
+  tb:
+    files:
+      - DA_testmodule.v
+
+targets:
+  dac8568:
+    default_tool: vivado
+    tools:
+      vivado:
+        part: xc7k70tfbg676-2
+    toplevel: dac_inter8568
+    filesets:
+      - rtl

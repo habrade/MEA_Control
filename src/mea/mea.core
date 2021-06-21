@@ -1,0 +1,19 @@
+CAPI=2:
+name: ::mea
+description: The logic for MEA.
+
+filesets:
+  rtl:
+    files:
+      - mea_scan.vhd
+      - mea_clocks.vhd
+      - gen_clk100_en.vhd
+      - Pixel_MEA.v:
+          file_type: verilogSource
+    file_type: vhdlSource-2008
+
+
+targets:
+  default:
+    filesets:
+      - rtl

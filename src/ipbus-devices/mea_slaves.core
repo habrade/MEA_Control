@@ -1,0 +1,21 @@
+CAPI=2:
+name: ::mea_slaves
+description: The slaves of the MEA.
+
+filesets:
+  rtl:
+    files:
+      - ipbus_payload.vhd
+      - ipbus_slave_reg_drp.vhd
+      - ipbus_dac8568_device.vhd
+      - ipbus_decode_payload.vhd
+      - ipbus_fabric_inside_device.vhd
+      - ipbus_global_device.vhd
+      - ipbus_mea_device.vhd
+    file_type: vhdlSource-2008
+
+
+targets:
+  default:
+    filesets:
+      - rtl
