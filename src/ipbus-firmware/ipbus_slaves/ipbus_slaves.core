@@ -1,5 +1,5 @@
 CAPI=2:
-name: ::IPbus_slaves
+name: ::ipbus_slaves
 description: IPbus slaves
 
 filesets:
@@ -8,8 +8,8 @@ filesets:
       - ipbus_reg_types.vhd:
           is_include_fiue: true
       - ipbus_reg_types_new.vhd:
-          is_include_fiue: true
-      - drp_decl.vhd
+           is_include_fiue: true
+      - drp_decl.vhd:
           is_include_fiue: true
       - ipbus_drp_bridge.vhd
       - syncreg_r.vhd

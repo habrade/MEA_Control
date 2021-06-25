@@ -6,7 +6,9 @@ filesets:
   rtl:
     files:
       - depend:
-        - src/dac8568/dac8568.core
+        - ::ipbus_gmii_core
+        - ::dac8568
+        - ::mea_core
       - src/MEA_Control.vhd
       - src/ipbus_decode_payload.vhd
       - src/ipbus_fabric_inside_device.vhd

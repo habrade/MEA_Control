@@ -12,13 +12,19 @@ filesets:
   tb:
     files:
       - DA_testmodule.v
+    file_type: verilogSource
 
 targets:
-  dac8568:
-    default_tool: vivado
-    tools:
-      vivado:
-        part: xc7k70tfbg676-2
-    toplevel: dac_inter8568
+  default: &default
     filesets:
       - rtl
+    toplevel: dac_inter8568
+
+  sim:
+    <<: *default
+    filesets_append:
+      - tb
+    tools:
+      vcs
+    toplevel: DA_testmodule
+

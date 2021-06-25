@@ -1,15 +1,24 @@
 CAPI=2:
-name: ::mea_ipbus_infra
-description: The firmware for DAC8568.
+name: ::ipbus_gmii_core
+description: The firmware of IPbus GMII interface core.
 
 filesets:
   rtl:
     files:
       - ipbus_util/clocks/clocks_7s_extphy.vhd
+      - ipbus_util/master/ipbus_ctrl.vhd
+      - ipbus_util/led_stetcher.vhd
+      - ./ipbus_gmii_infra.vhd
     file_type: vhdlSource
-
+    depend:
+      - ::ipbus_eth
+      - ::ipbus_core
+      - ::ipbus_slaves
+      - ::ipbus_transport_udp
 
 targets:
-  ipbus_gmii_core:
+  default: &default
     filesets:
       - rtl
+    tools:
+      vivado
