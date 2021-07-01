@@ -117,8 +117,10 @@ create_generated_clock -name clk_125M -source [get_pins ipbus_infra/clocks/mmcm/
 
 # Other derived clocks
 create_generated_clock -name clk_aux -source [get_pins ipbus_infra/clocks/mmcm/CLKIN1] [get_pins ipbus_infra/clocks/mmcm/CLKOUT4]
+#create_generated_clock -name clk_dac -source [get_clocks clk_aux] [get_pins gen_clocks/mmcm/CLKOUT0]
+#create_generated_clock -name clk_mea -source [get_clocks clk_aux] [get_pins gen_clocks/mmcm/CLKOUT1]
 #create_generated_clock -name clk_MEA -source [get_pins mea_clocks/mmcm2e_drp_gen[0].MMCME2_ADV_inst/CLKIN1] [get_pins mea_clocks/mmcm2e_drp_gen[0].MMCME2_ADV_inst/CLKOUT0]
-create_generated_clock -name clk_div_0 -source [get_pins freq_div/clkdiv[0]] -divide_by 64 -multiply_by 1 [get_pins freq_div/clk[0]]
+#create_generated_clock -name clk_div_0 -source [get_pins freq_div/clkdiv[0]] -divide_by 64 -multiply_by 1 [get_pins freq_div/clk[0]]
 
 set_false_path -through [get_pins ipbus_infra/clocks/rst_reg/Q]
 set_false_path -through [get_nets ipbus_infra/clocks/nuke_i]

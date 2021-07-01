@@ -72,21 +72,22 @@ architecture rtl of MEA_Control is
   signal clk_mea_rst       : std_logic;
   signal mea_clocks_locked : std_logic_vector(N_DRP-1 downto 0);
 
+  -- Clocks
+  signal clk_dac         : std_logic;
+  signal clk_mea         : std_logic;
+  signal user_clk_locked : std_logic;
+
 
   -- FREQ Counter
-  constant N_CLK     : integer := 1;
-  signal clk_mea_div : std_logic_vector(N_CLK -1 downto 0);
+  constant N_CLK : integer := 2;
+  signal clk_div : std_logic_vector(N_CLK -1 downto 0);
 
-  constant CLK_AUX_FREQ : real := 10.0;
+  constant CLK_AUX_FREQ : real := 50.0;
 
-  attribute mark_debug                      : string;
-  attribute mark_debug of clk_mea_o         : signal is "true";
-  attribute mark_debug of clk_mea_div       : signal is "true";
-  attribute mark_debug of mea_clocks_locked : signal is "true";
-  attribute mark_debug of mea_start         : signal is "true";
-  attribute mark_debug of mea_speak         : signal is "true";
-  attribute mark_debug of mea_reset         : signal is "true";
-  attribute mark_debug of clk_mea_rst       : signal is "true";
+  attribute mark_debug              : string;
+  attribute mark_debug of mea_start : signal is "true";
+  attribute mark_debug of mea_speak : signal is "true";
+  attribute mark_debug of mea_reset : signal is "true";
 
 begin
 
@@ -146,8 +147,8 @@ begin
       ipb_out => ipb_in,
 
       -- Slave clocks
-      clk            => clk_aux,
-      rst            => rst_aux,
+      clk            => clk_mea,
+      rst            => (not user_clk_locked),
       -- Global
       nuke           => nuke,
       soft_rst       => soft_rst,
@@ -173,16 +174,18 @@ begin
       drp_out        => drp_m2s,
       drp_in         => drp_s2m,
       -- FREQ CTR
-      clk_ctr_in     => clk_mea_div
+      clk_ctr_in     => clk_div
       );
 
-  gen_clk100 : entity work.gen_clk100
+  gen_clocks : entity work.gen_clocks
     port map(
-      clk       => clk_aux,
+      clk       => clk_aux,             -- 50 MHz input
       rst       => rst_aux,
-      clk100_en => clk100_en
+      clk100_en => clk100_en,
+      clk_dac   => clk_dac,
+      clk_mea   => clk_mea,
+      locked    => user_clk_locked
       );
-
 
 
   pixel_mea : entity work.Pixel_MEA
@@ -197,8 +200,8 @@ begin
 
   mea_scan : entity work.mea_scan
     port map(
-      clk        => clk_aux,
-      rst        => rst_aux,
+      clk        => clk_mea,
+      rst        => not user_clk_locked,
       start_scan => mea_start_scan,
       reset_scan => mea_reset_scan,
       speak      => mea_speak,
@@ -209,8 +212,8 @@ begin
   dac8568_rst_n <= not dac8568_rst;
   dac8568 : entity work.dac_inter8568
     port map(
-      clk       => clk_aux,
-      reset     => dac8568_rst_n or (not rst_aux),
+      clk       => clk_dac,
+      reset     => dac8568_rst_n or (not user_clk_locked),
       busy_8568 => dac8568_busy,
       start     => dac8568_start,
       ch        => dac8568_sel_ch,
@@ -244,15 +247,15 @@ begin
 --      drp_in      => drp_m2s
 --      );
 
-  mea_clk <= clk_aux;
+  mea_clk <= clk_mea;
 
   freq_div : entity work.freq_ctr_div
     generic map(
       N_CLK => N_CLK
       )
     port map(
-      clk(0) => clk_mea_o,
-      clkdiv => clk_mea_div
+      clk    => clk_dac & clk_mea,
+      clkdiv => clk_div
       );
 
 end rtl;

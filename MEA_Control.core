@@ -33,7 +33,6 @@ targets:
   # The "synth" target synthesizes the design. (It could have any name.)
   synth:
     <<: *default
-    description: Synthesize the design for a Nexys Video FPGA board
     default_tool: vivado
     tools:
       vivado:

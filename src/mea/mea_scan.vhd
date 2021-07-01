@@ -24,6 +24,15 @@ architecture behv of mea_scan is
 
   signal rst_cnt : integer range 0 to 3;
 
+  --Debug
+  attribute mark_debug               : string;
+  attribute mark_debug of rst_cnt    : signal is "true";
+  attribute mark_debug of speak      : signal is "true";
+  attribute mark_debug of start      : signal is "true";
+  attribute mark_debug of rst_out    : signal is "true";
+  attribute mark_debug of start_scan : signal is "true";
+  attribute mark_debug of reset_scan : signal is "true";
+
 begin
   -- architecture body
 
@@ -67,6 +76,7 @@ begin
           speak   <= '0';
           start   <= '0';
           rst_out <= '0';
+          rst_cnt <= 0;
         when RESET_CHIP =>
           rst_out <= '1';
           rst_cnt <= rst_cnt + 1;
@@ -75,8 +85,9 @@ begin
           start   <= '1';
           rst_cnt <= 0;
         when ASS_SPEAK =>
-          start <= '0';
-          speak <= '1';
+          start   <= '0';
+          speak   <= '1';
+          rst_cnt <= 0;
         when others => null;
       end case;
     end if;
