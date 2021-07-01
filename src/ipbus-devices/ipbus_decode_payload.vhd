@@ -20,7 +20,7 @@ package ipbus_decode_payload is
 -- START automatically  generated VHDL the Thu May  3 15:36:57 2018 
   constant N_SLV_GLOBAL      : integer := 0;
   constant N_SLV_DAC8568     : integer := 1;
-  constant N_SLV_SCA         : integer := 2;
+  constant N_SLV_MEA         : integer := 2;
   constant N_SLV_FREQ_CTR    : integer := 3;
   constant N_SLAVES          : integer := 4;
 -- END automatically generated VHDL
@@ -39,7 +39,7 @@ package body ipbus_decode_payload is
     elsif std_match(addr, "001-----------------------------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_DAC8568, IPBUS_SEL_WIDTH)); 
     elsif std_match(addr, "010-----------------------------") then
-      sel := ipbus_sel_t(to_unsigned(N_SLV_SCA, IPBUS_SEL_WIDTH)); 
+      sel := ipbus_sel_t(to_unsigned(N_SLV_MEA, IPBUS_SEL_WIDTH)); 
     elsif std_match(addr, "011-----------------------------") then
       sel := ipbus_sel_t(to_unsigned(N_SLV_FREQ_CTR, IPBUS_SEL_WIDTH));
     else

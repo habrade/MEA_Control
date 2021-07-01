@@ -9,7 +9,7 @@ filesets:
       - wr_inter.v
     file_type: verilogSource
 
-  tb:
+  tb: &tb
     files:
       - DA_testmodule.v
     file_type: verilogSource
@@ -19,12 +19,3 @@ targets:
     filesets:
       - rtl
     toplevel: dac_inter8568
-
-  sim:
-    <<: *default
-    filesets_append:
-      - tb
-    tools:
-      vcs
-    toplevel: DA_testmodule
-

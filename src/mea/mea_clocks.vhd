@@ -43,8 +43,9 @@ entity mea_clocks is
     clk : in std_logic;
 
     -- MEA Clocks
-    clk_MEA : out std_logic;
-    locked  : out std_logic_vector(N_DRP-1 downto 0);
+    clk_MEA     : out std_logic;
+    clk_MEA_rst : out std_logic;
+    locked      : out std_logic_vector(N_DRP-1 downto 0);
 
     -- MMCM DRP Ports
     rst_mmcm : in  std_logic_vector(N_DRP-1 downto 0);
@@ -55,29 +56,36 @@ end mea_clocks;
 
 architecture behv of mea_clocks is
 
-  signal clkout0_arr : std_logic_vector(N_DRP-1 downto 0);
-  signal rst_t       : std_logic_vector(N_DRP-1 downto 0);
+  signal clkout0_arr_i : std_logic_vector(N_DRP-1 downto 0);
+  signal clkout0_arr   : std_logic_vector(N_DRP-1 downto 0);
+  signal rst_t         : std_logic_vector(N_DRP-1 downto 0);
 
   signal clkin_bufgout, CLKIN_ibuf   : std_logic;
   signal clkfb_bufgout, clkfb_bufgin : std_logic_vector(N_DRP-1 downto 0);
+
+  --Debug
+  attribute mark_debug            : string;
+  attribute mark_debug of clk_MEA : signal is "true";
 
 begin
 
   CLKIN_ibuf <= clk;
 
-  clk_MEA <= clkout0_arr(0);
+  clk_MEA     <= clkout0_arr(0);
+  clk_MEA_rst <= rst_t(0);
 
   BUFG_IN : BUFG port map(O => clkin_bufgout, I => CLKIN_ibuf);
 
   mmcm2e_drp_gen : for index in N_DRP-1 downto 0 generate
 
-    BUFG_FB : BUFG port map(O => clkfb_bufgout(index), I => clkfb_bufgin(index));
-    gen_rst : rst_t(index) <= rst_mmcm(index) or rst;
+    BUFG_FB     : BUFG port map(O => clkfb_bufgout(index), I => clkfb_bufgin(index));
+    BUFG_CLKOUT : BUFG port map(O => clkout0_arr(index), I => clkout0_arr_i(index));
+    gen_rst     : rst_t(index) <= rst_mmcm(index) or rst;
 
     MMCME2_ADV_inst : MMCME2_ADV
       generic map (
         BANDWIDTH            => "OPTIMIZED",  -- Jitter programming (OPTIMIZED, HIGH, LOW)
-        CLKFBOUT_MULT_F      => 40.0,  -- Multiply value for all CLKOUT (2.000-64.000).
+        CLKFBOUT_MULT_F      => 4.0,  -- Multiply value for all CLKOUT (2.000-64.000).
         CLKFBOUT_PHASE       => 0.0,  -- Phase offset in degrees of CLKFB (-360.000-360.000).
         -- CLKIN_PERIOD: Input clock period in ns to ps resolution (i.e. 33.333 is 30 MHz).
         CLKIN1_PERIOD        => 32.0,   -- 40MHz
@@ -129,7 +137,7 @@ begin
         )
       port map (
         -- Clock Outputs: 1-bit (each) output: User configurable clock outputs
-        CLKOUT0      => clkout0_arr(index),   -- 1-bit output: CLKOUT0
+        CLKOUT0      => clkout0_arr_i(index),   -- 1-bit output: CLKOUT0
 --          CLKOUT0B => clkout0_n_arr(index),  -- 1-bit output: Inverted CLKOUT0
         CLKOUT0B     => open,           -- 1-bit output: Inverted CLKOUT0
         CLKOUT1      => open,           -- 1-bit output: CLKOUT1
@@ -152,20 +160,20 @@ begin
         -- Status Ports: 1-bit (each) output: MMCM status ports
         CLKFBSTOPPED => open,           -- 1-bit output: Feedback clock stopped
         CLKINSTOPPED => open,           -- 1-bit output: Input clock stopped
-        LOCKED       => locked(index),    -- 1-bit output: LOCK
+        LOCKED       => locked(index),  -- 1-bit output: LOCK
         -- Clock Inputs: 1-bit (each) input: Clock inputs
         CLKIN1       => clkin_bufgout,  -- 1-bit input: Primary clock
         CLKIN2       => '0',            -- 1-bit input: Secondary clock
         -- Control Ports: 1-bit (each) input: MMCM control ports
         CLKINSEL     => '1',  -- 1-bit input: Clock select, High=CLKIN1 Low=CLKIN2
         PWRDWN       => '0',            -- 1-bit input: Power-down
-        RST          => rst_t(index),     -- 1-bit input: Reset
+        RST          => rst_t(index),   -- 1-bit input: Reset
         -- DRP Ports: 7-bit (each) input: Dynamic reconfiguration ports
         DADDR        => drp_in(index).addr(6 downto 0),  -- 7-bit input: DRP address
         DCLK         => clkin_bufgout,  -- 1-bit input: DRP clock
-        DEN          => drp_in(index).en,  -- 1-bit input: DRP enable
+        DEN          => drp_in(index).en,     -- 1-bit input: DRP enable
         DI           => drp_in(index).data,   -- 16-bit input: DRP data
-        DWE          => drp_in(index).we,  -- 1-bit input: DRP write enable
+        DWE          => drp_in(index).we,     -- 1-bit input: DRP write enable
         -- Dynamic Phase Shift Ports: 1-bit (each) input: Ports used for dynamic phase shifting of the outputs
         PSCLK        => '0',            -- 1-bit input: Phase shift clock
         PSEN         => '0',            -- 1-bit input: Phase shift enable

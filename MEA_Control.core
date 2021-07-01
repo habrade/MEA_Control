@@ -1,21 +1,18 @@
 CAPI=2:
-name: ::mea
-description: The firmware for controlling the MEA chip. 
+name: ::MEA_Control
+description: The firmware for controlling the MEA chip.
 
 filesets:
+
   rtl:
     files:
-      - depend:
-        - ::ipbus_gmii_core
-        - ::dac8568
-        - ::mea_core
       - src/MEA_Control.vhd
-      - src/ipbus_decode_payload.vhd
-      - src/ipbus_fabric_inside_device.vhd
-      - src/ipbus_global_device.vhd
-      - src/ipbus_gmii_infra.vhd
-      - src/ipbus_payload.vhd
     file_type: vhdlSource-2008
+    depend:
+      - ::ipbus_gmii_core
+      - ::dac8568
+      - ::mea
+      - ::mea_slaves
 
   scripts:
     files:
@@ -28,6 +25,9 @@ targets:
   default: &default
     filesets:
       - rtl
+    tools:
+      vivado:
+        part: xc7k70tfbg676-2
     toplevel: MEA_Control
 
   # The "synth" target synthesizes the design. (It could have any name.)
@@ -38,6 +38,7 @@ targets:
     tools:
       vivado:
         part: xc7k70tfbg676-2
+    toplevel: MEA_Control
 
   mcs:
     filesets:

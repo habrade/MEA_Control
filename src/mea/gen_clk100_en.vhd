@@ -34,7 +34,7 @@ end entity gen_clk100;
 
 architecture behv of gen_clk100 is
 
-  signal cnt : integer range 0 to 500 := 0;
+  signal cnt : integer range 0 to 50 := 0;
 
 begin  -- architecture behv
 
@@ -43,7 +43,7 @@ begin  -- architecture behv
     if ?? rst then
       clk100_en <= '0';
     elsif rising_edge(clk) then
-      if cnt = 100 then
+      if cnt = 50 then
         clk100_en <= '1';
         cnt       <= 0;
       else

@@ -39,6 +39,7 @@ entity ipbus_payload is
     -- MEA
     -- Control Port
     mea_start_scan : out std_logic;
+    mea_reset_scan : out std_logic;
 
     -- MMCM DRP Ports
     locked     : in  std_logic_vector(N_DRP-1 downto 0);
@@ -117,14 +118,15 @@ begin
     port map(
       ipb_clk => ipb_clk,
       ipb_rst => ipb_rst,
-      ipb_in  => ipbw(N_SLV_SCA),
-      ipb_out => ipbr(N_SLV_SCA),
+      ipb_in  => ipbw(N_SLV_MEA),
+      ipb_out => ipbr(N_SLV_MEA),
 
-      clk => clk,
-      rst => rst,
+      clk => ipb_clk,
+      rst => ipb_rst,
 
       -- MEA IO PORTS
       mea_start_scan => mea_start_scan,
+      mea_reset_scan => mea_reset_scan,
 
       -- MMCM DRP Ports.
       locked   => locked,

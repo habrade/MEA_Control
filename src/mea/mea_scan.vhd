@@ -9,6 +9,7 @@ entity mea_scan is
     rst : in std_logic;
 
     start_scan : in  std_logic;         -- Start signal from software
+    reset_scan : in  std_logic;
     -- The io ports of the ASIC
     speak      : out std_logic;
     start      : out std_logic;
@@ -50,7 +51,9 @@ begin
       when ASS_START =>
         state_next <= ASS_SPEAK;
       when ASS_SPEAK =>
-        null;
+        if ?? reset_scan then
+          state_next <= IDLE;
+        end if;
       when others =>
         state_next <= IDLE;
     end case;

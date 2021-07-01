@@ -51,6 +51,7 @@ entity ipbus_mea_device is
 
     -- Control Port
     mea_start_scan : out std_logic;
+    mea_reset_scan : out std_logic;
 
     -- MMCM DRP Ports
     locked   : in  std_logic_vector(N_DRP-1 downto 0);
@@ -64,6 +65,9 @@ architecture behv of ipbus_mea_device is
 
   --Temporary registers
   signal rst_mmcm_tmp : std_logic_vector(N_DRP-1 downto 0);
+
+  signal mea_start_scan_tmp : std_logic;
+  signal mea_reset_scan_tmp : std_logic;
 
   -- IPbus reg
   constant SYNC_REG_ENA               : boolean := false;
@@ -115,7 +119,8 @@ begin
   begin
     if rising_edge(clk) then
       -- MEA IO
-      mea_start_scan <= ctrl(0)(0);
+      mea_start_scan_tmp <= ctrl(0)(0);
+      mea_reset_scan_tmp <= ctrl(0)(1);
 
       -- DRP
       rst_mmcm_tmp(0) <= ctrl(1)(0);
@@ -129,8 +134,16 @@ begin
   sync_ctrl_signals : process(clk)
   begin
     if rising_edge(clk) then
-
       if ctrl_reg_stb_r(0) = '1' then
+        mea_start_scan <= mea_start_scan_tmp;
+        mea_reset_scan <= mea_reset_scan_tmp;
+      else
+        mea_start_scan <= '0';
+        mea_reset_scan <= '0';
+      end if;
+
+
+      if ctrl_reg_stb_r(1) = '1' then
         rst_mmcm <= rst_mmcm_tmp;
         drp_rst  <= drp_rst_tmp;
       else

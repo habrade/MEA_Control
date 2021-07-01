@@ -74,6 +74,11 @@ architecture rtl of ipbus_gmii_infra is
   signal mac_tx_valid, mac_tx_last, mac_tx_error, mac_tx_ready, mac_rx_valid, mac_rx_last, mac_rx_error                             : std_logic;
   signal led_p                                                                                                                      : std_logic_vector(0 downto 0);
 
+  --Debug
+  attribute mark_debug        : string;
+  attribute mark_debug of clk_aux_o : signal is "true";
+
+
 begin
 
 --      DCM clock generation for internal bus, ethernet

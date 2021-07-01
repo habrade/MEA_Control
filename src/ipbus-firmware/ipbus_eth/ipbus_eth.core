@@ -5,6 +5,8 @@ description: IPbus ethernet.
 filesets:
   rtl:
     files:
+      - mac_fifo_axi4.xci: {filetype: xci}
+      - temac_gbe_v9_0_gmii.xci: {filetype: xci}
       - emac_hostbus_decl.vhd:
           is_include_fiue: true
       - eth_7s_gmii.vhd

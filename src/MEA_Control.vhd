@@ -60,6 +60,7 @@ architecture rtl of MEA_Control is
 
   -- MEA
   signal mea_start_scan : std_logic;
+  signal mea_reset_scan : std_logic;
   signal clk100_en      : std_logic;
 
   -- MEA MMCM DRP
@@ -68,6 +69,7 @@ architecture rtl of MEA_Control is
   signal drp_m2s           : drp_wbus_array(N_DRP-1 downto 0);
   signal drp_s2m           : drp_rbus_array(N_DRP-1 downto 0);
   signal clk_mea_o         : std_logic;
+  signal clk_mea_rst       : std_logic;
   signal mea_clocks_locked : std_logic_vector(N_DRP-1 downto 0);
 
 
@@ -75,7 +77,7 @@ architecture rtl of MEA_Control is
   constant N_CLK     : integer := 1;
   signal clk_mea_div : std_logic_vector(N_CLK -1 downto 0);
 
-  constant CLK_AUX_FREQ : real := 50.0;
+  constant CLK_AUX_FREQ : real := 10.0;
 
   attribute mark_debug                      : string;
   attribute mark_debug of clk_mea_o         : signal is "true";
@@ -101,7 +103,7 @@ begin
       rst_aux_o    => rst_aux,
       nuke         => nuke,
       soft_rst     => soft_rst,
-      leds         => leds(1 downto 0),
+      leds         => leds(1 downto 0),  -- LED0: D2 LED1: D3
       gmii_gtx_clk => gmii_gtx_clk,
       gmii_txd     => gmii_txd,
       gmii_tx_en   => gmii_tx_en,
@@ -116,8 +118,8 @@ begin
       ipb_out      => ipb_out
       );
 
-  leds(2) <= mea_mark;
-  leds(3) <= mea_clocks_locked(0);
+  leds(2) <= mea_mark;                  -- LED2: D4
+  leds(3) <= mea_clocks_locked(0);      -- LED3: D12
   phy_rst <= not phy_rst_e;
 
 --      mac_addr <= X"020ddba1151" & dip_sw; -- Careful here, arbitrary addresses do not always work
@@ -158,8 +160,9 @@ begin
       dac8568_data_f => dac8568_data_f,
       dac8568_data_g => dac8568_data_g,
       dac8568_data_h => dac8568_data_h,
-      --MEA
+      -- MEA
       mea_start_scan => mea_start_scan,
+      mea_reset_scan => mea_reset_scan,
       -- MMCM DRP Ports
       locked         => mea_clocks_locked,
       rst_mmcm       => rst_mmcm,
@@ -190,9 +193,10 @@ begin
 
   mea_scan : entity work.mea_scan
     port map(
-      clk        => clk_aux,
-      rst        => rst_aux,
+      clk        => clk_mea_o,
+      rst        => clk_mea_rst,
       start_scan => mea_start_scan,
+      reset_scan => mea_reset_scan,
       speak      => mea_speak,
       start      => mea_start,
       rst_out    => mea_reset
@@ -202,7 +206,7 @@ begin
   dac8568 : entity work.dac_inter8568
     port map(
       clk       => clk_aux,
-      reset     => dac8568_rst_n,
+      reset     => dac8568_rst_n or (not rst_aux),
       busy_8568 => dac8568_busy,
       start     => dac8568_start,
       ch        => dac8568_sel_ch,
@@ -225,14 +229,15 @@ begin
       N_DRP => N_DRP
       )
     port map(
-      rst      => rst_ipb,
-      clk      => clk_ipb,
-      clk_MEA  => clk_mea_o,
+      rst         => rst_ipb,
+      clk         => clk_ipb,
+      clk_MEA     => clk_mea_o,
+      clk_MEA_rst => clk_mea_rst,
       -- MMCM DRP Ports
-      locked   => mea_clocks_locked,
-      rst_mmcm => rst_mmcm,
-      drp_out  => drp_s2m,
-      drp_in   => drp_m2s
+      locked      => mea_clocks_locked,
+      rst_mmcm    => rst_mmcm,
+      drp_out     => drp_s2m,
+      drp_in      => drp_m2s
       );
 
   mea_clk <= clk_mea_o;
