@@ -83,6 +83,10 @@ architecture rtl of MEA_Control is
   attribute mark_debug of clk_mea_o         : signal is "true";
   attribute mark_debug of clk_mea_div       : signal is "true";
   attribute mark_debug of mea_clocks_locked : signal is "true";
+  attribute mark_debug of mea_start         : signal is "true";
+  attribute mark_debug of mea_speak         : signal is "true";
+  attribute mark_debug of mea_reset         : signal is "true";
+  attribute mark_debug of clk_mea_rst       : signal is "true";
 
 begin
 
@@ -193,8 +197,8 @@ begin
 
   mea_scan : entity work.mea_scan
     port map(
-      clk        => clk_mea_o,
-      rst        => clk_mea_rst,
+      clk        => clk_aux,
+      rst        => rst_aux,
       start_scan => mea_start_scan,
       reset_scan => mea_reset_scan,
       speak      => mea_speak,
@@ -224,23 +228,23 @@ begin
       syn  => DAC_SYNC_N
       );
 
-  mea_clocks : entity work.mea_clocks
-    generic map(
-      N_DRP => N_DRP
-      )
-    port map(
-      rst         => rst_ipb,
-      clk         => clk_ipb,
-      clk_MEA     => clk_mea_o,
-      clk_MEA_rst => clk_mea_rst,
-      -- MMCM DRP Ports
-      locked      => mea_clocks_locked,
-      rst_mmcm    => rst_mmcm,
-      drp_out     => drp_s2m,
-      drp_in      => drp_m2s
-      );
+--  mea_clocks : entity work.mea_clocks
+--    generic map(
+--      N_DRP => N_DRP
+--      )
+--    port map(
+--      rst         => rst_ipb,
+--      clk         => clk_ipb,
+--      clk_MEA     => clk_mea_o,
+--      clk_MEA_rst => clk_mea_rst,
+--      -- MMCM DRP Ports
+--      locked      => mea_clocks_locked,
+--      rst_mmcm    => rst_mmcm,
+--      drp_out     => drp_s2m,
+--      drp_in      => drp_m2s
+--      );
 
-  mea_clk <= clk_mea_o;
+  mea_clk <= clk_aux;
 
   freq_div : entity work.freq_ctr_div
     generic map(

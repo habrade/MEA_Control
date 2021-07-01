@@ -121,8 +121,8 @@ begin
       ipb_in  => ipbw(N_SLV_MEA),
       ipb_out => ipbr(N_SLV_MEA),
 
-      clk => ipb_clk,
-      rst => ipb_rst,
+      clk => clk,
+      rst => rst,
 
       -- MEA IO PORTS
       mea_start_scan => mea_start_scan,
