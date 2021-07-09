@@ -18,7 +18,10 @@ entity ipbus_payload is
 
     clk : in std_logic;
     rst : in std_logic;
-
+    
+    clk_dac : in std_logic;
+    rst_dac : in std_logic;
+	
     -- Global
     nuke           : out std_logic;
     soft_rst       : out std_logic;
@@ -28,18 +31,20 @@ entity ipbus_payload is
     dac8568_start  : out std_logic;
     dac8568_sel_ch : out std_logic_vector(7 downto 0);
 
-    dac8568_data_a : out std_logic_vector(15 downto 0);
-    dac8568_data_b : out std_logic_vector(15 downto 0);
-    dac8568_data_c : out std_logic_vector(15 downto 0);
-    dac8568_data_d : out std_logic_vector(15 downto 0);
-    dac8568_data_e : out std_logic_vector(15 downto 0);
-    dac8568_data_f : out std_logic_vector(15 downto 0);
-    dac8568_data_g : out std_logic_vector(15 downto 0);
-    dac8568_data_h : out std_logic_vector(15 downto 0);
+    dac8568_data_a  : out std_logic_vector(15 downto 0);
+    dac8568_data_b  : out std_logic_vector(15 downto 0);
+    dac8568_data_c  : out std_logic_vector(15 downto 0);
+    dac8568_data_d  : out std_logic_vector(15 downto 0);
+    dac8568_data_e  : out std_logic_vector(15 downto 0);
+    dac8568_data_f  : out std_logic_vector(15 downto 0);
+    dac8568_data_g  : out std_logic_vector(15 downto 0);
+    dac8568_data_h  : out std_logic_vector(15 downto 0);
     -- MEA
     -- Control Port
-    mea_start_scan : out std_logic;
-    mea_reset_scan : out std_logic;
+    sel_mea_clk     : out std_logic;
+    mea_clk_div_cnt : out integer;
+    mea_start_scan  : out std_logic;
+    mea_reset_scan  : out std_logic;
 
     -- MMCM DRP Ports
     locked     : in  std_logic_vector(N_DRP-1 downto 0);
@@ -91,8 +96,8 @@ begin
       ipb_in  => ipbw(N_SLV_DAC8568),
       ipb_out => ipbr(N_SLV_DAC8568),
 
-      clk => clk,
-      rst => rst,
+      clk => clk_dac,
+      rst => rst_dac,
 
       -- DAC8568  
       dac8568_busy => dac8568_busy,
@@ -125,8 +130,10 @@ begin
       rst => rst,
 
       -- MEA IO PORTS
-      mea_start_scan => mea_start_scan,
-      mea_reset_scan => mea_reset_scan,
+      mea_start_scan  => mea_start_scan,
+      mea_reset_scan  => mea_reset_scan,
+      sel_mea_clk     => sel_mea_clk,
+      mea_clk_div_cnt => mea_clk_div_cnt,
 
       -- MMCM DRP Ports.
       locked   => locked,

@@ -3,10 +3,10 @@
 -- Project    : 
 -------------------------------------------------------------------------------
 -- File       : gen_clocks_en.vhd
--- Author     : sdong  <sdong@sdong-ubuntu>
+-- Author     : sdong  <sdong@mails.ccnu.edu.cn>
 -- Company    : 
 -- Created    : 2021-06-15
--- Last update: 2021-07-01
+-- Last update: 2021-07-09
 -- Platform   : 
 -- Standard   : VHDL'93/02
 -------------------------------------------------------------------------------
@@ -32,12 +32,14 @@ entity gen_clocks is
     MEA_FREQ : real := 5.0
     );
   port (
-    clk       : in  std_logic;          -- 50MHz input
-    rst       : in  std_logic;
-    clk100_en : out std_logic;
-    clk_dac   : out std_logic;
-    clk_mea   : out std_logic;
-    locked    : out std_logic
+    clk             : in  std_logic;    -- 50MHz input
+    rst             : in  std_logic;
+    sel_mea_clk     : in  std_logic;
+    mea_clk_div_cnt : in  integer;
+    clk100_en       : out std_logic;
+    clk_dac         : out std_logic;
+    clk_mea         : out std_logic;
+    locked          : out std_logic
     );
 end entity gen_clocks;
 
@@ -52,6 +54,8 @@ architecture behv of gen_clocks is
   signal clkfb                : std_logic;
   signal clk_dac_i, clk_mea_i : std_logic;
   signal clk_dac_b, clk_mea_b : std_logic;
+
+  signal clK_mea_div : std_logic := '0';
 
 
 begin  -- architecture behv
@@ -102,7 +106,20 @@ begin  -- architecture behv
     o => clk_mea_b
     );
 
-  clk_mea <= clk_mea_b;
+  BUFGMUX_CTRL_inst : BUFGMUX_CTRL
+    port map (
+      O  => clk_mea,                    -- 1-bit output: Clock output
+      I0 => clk_mea_b,                  -- 1-bit input: Clock input (S=0)
+      I1 => clk_mea_div,                -- 1-bit input: Clock input (S=1)
+      S  => sel_mea_clk                 -- 1-bit input: Clock select
+      );
 
+  mea_clk_div : entity work.mea_clk_div
+    port map(
+      clk_mea     => clk_mea_b,
+      rst         => rst,
+      clk_cnt     => mea_clk_div_cnt,
+      clk_mea_div => clk_mea_div
+      );
 
 end architecture behv;

@@ -58,10 +58,14 @@ architecture rtl of MEA_Control is
   signal dac8568_data_a, dac8568_data_b, dac8568_data_c, dac8568_data_d : std_logic_vector(15 downto 0);
   signal dac8568_data_e, dac8568_data_f, dac8568_data_g, dac8568_data_h : std_logic_vector(15 downto 0);
 
+  signal rst_dac : std_logic;
+
   -- MEA
-  signal mea_start_scan : std_logic;
-  signal mea_reset_scan : std_logic;
-  signal clk100_en      : std_logic;
+  signal sel_mea_clk     : std_logic;
+  signal mea_clk_div_cnt : integer;
+  signal mea_start_scan  : std_logic;
+  signal mea_reset_scan  : std_logic;
+  signal clk100_en       : std_logic;
 
   -- MEA MMCM DRP
   constant N_DRP           : integer := 1;
@@ -147,44 +151,54 @@ begin
       ipb_out => ipb_in,
 
       -- Slave clocks
-      clk            => clk_mea,
-      rst            => (not user_clk_locked),
+      clk => clk_mea,
+      rst => (not user_clk_locked),
+
+      -- DAC clocks
+      clk_dac => clk_dac,
+      rst_dac => (not user_clk_locked),
+
       -- Global
-      nuke           => nuke,
-      soft_rst       => soft_rst,
+      nuke            => nuke,
+      soft_rst        => soft_rst,
       -- DAC8568
-      dac8568_busy   => dac8568_busy,
-      dac8568_rst    => dac8568_rst,
-      dac8568_start  => dac8568_start,
-      dac8568_sel_ch => dac8568_sel_ch,
-      dac8568_data_a => dac8568_data_a,
-      dac8568_data_b => dac8568_data_b,
-      dac8568_data_c => dac8568_data_c,
-      dac8568_data_d => dac8568_data_d,
-      dac8568_data_e => dac8568_data_e,
-      dac8568_data_f => dac8568_data_f,
-      dac8568_data_g => dac8568_data_g,
-      dac8568_data_h => dac8568_data_h,
+      dac8568_busy    => dac8568_busy,
+      dac8568_rst     => dac8568_rst,
+      dac8568_start   => dac8568_start,
+      dac8568_sel_ch  => dac8568_sel_ch,
+      dac8568_data_a  => dac8568_data_a,
+      dac8568_data_b  => dac8568_data_b,
+      dac8568_data_c  => dac8568_data_c,
+      dac8568_data_d  => dac8568_data_d,
+      dac8568_data_e  => dac8568_data_e,
+      dac8568_data_f  => dac8568_data_f,
+      dac8568_data_g  => dac8568_data_g,
+      dac8568_data_h  => dac8568_data_h,
       -- MEA
-      mea_start_scan => mea_start_scan,
-      mea_reset_scan => mea_reset_scan,
+      mea_start_scan  => mea_start_scan,
+      mea_reset_scan  => mea_reset_scan,
+      sel_mea_clk     => sel_mea_clk,
+      mea_clk_div_cnt => mea_clk_div_cnt,
+
       -- MMCM DRP Ports
-      locked         => mea_clocks_locked,
-      rst_mmcm       => rst_mmcm,
-      drp_out        => drp_m2s,
-      drp_in         => drp_s2m,
+      locked     => mea_clocks_locked,
+      rst_mmcm   => rst_mmcm,
+      drp_out    => drp_m2s,
+      drp_in     => drp_s2m,
       -- FREQ CTR
-      clk_ctr_in     => clk_div
+      clk_ctr_in => clk_div
       );
 
   gen_clocks : entity work.gen_clocks
     port map(
-      clk       => clk_aux,             -- 50 MHz input
-      rst       => rst_aux,
-      clk100_en => clk100_en,
-      clk_dac   => clk_dac,
-      clk_mea   => clk_mea,
-      locked    => user_clk_locked
+      clk             => clk_aux,       -- 50 MHz input
+      rst             => rst_aux,
+      sel_mea_clk     => sel_mea_clk,
+      mea_clk_div_cnt => mea_clk_div_cnt,
+      clk100_en       => clk100_en,
+      clk_dac         => clk_dac,
+      clk_mea         => clk_mea,
+      locked          => user_clk_locked
       );
 
 
@@ -210,10 +224,11 @@ begin
       );
 
   dac8568_rst_n <= not dac8568_rst;
+  rst_dac       <= dac8568_rst_n or (not user_clk_locked);
   dac8568 : entity work.dac_inter8568
     port map(
       clk       => clk_dac,
-      reset     => dac8568_rst_n or (not user_clk_locked),
+      reset     => rst_dac,
       busy_8568 => dac8568_busy,
       start     => dac8568_start,
       ch        => dac8568_sel_ch,
