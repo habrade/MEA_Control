@@ -5,16 +5,14 @@ description: IPbus core.
 filesets:
   rtl:
     files:
-      - ipbus_arb.vhd
-      - ipbus_dc_fabric_sel.vhd
-      - ipbus_dc_node.vhd
-      - ipbus_fabric.vhd
+      #- ipbus_arb.vhd
+      #- ipbus_dc_fabric_sel.vhd
+      #- ipbus_dc_node.vhd
+      #- ipbus_fabric.vhd
       - ipbus_fabric_sel.vhd
-      - ipbus_package.vhd:
-          is_include_file: true
-      - ipbus_shim.vhd
-      - ipbus_trans_decl.vhd:
-          is_include_file: true
+      - ipbus_package.vhd
+      #- ipbus_shim.vhd
+      - ipbus_trans_decl.vhd
       - trans_arb.vhd
       - transactor_cfg.vhd
       - transactor_if.vhd

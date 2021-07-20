@@ -4,6 +4,17 @@ description: The firmware for controlling the MEA chip.
 
 filesets:
 
+  pinout:
+    files:
+      - constrains/pins.tcl
+      - constrains/top_constrains.tcl
+    file_type: xdc
+  
+  timing:
+    files:
+      - constrains/clocks_utils.tcl
+    file_type: tclSouce
+
   rtl:
     files:
       - src/MEA_Control.vhd
@@ -31,8 +42,11 @@ targets:
     toplevel: MEA_Control
 
   # The "synth" target synthesizes the design. (It could have any name.)
-  synth:
+  MEA_Control:
     <<: *default
+    filesets_append:
+      - timing
+      - pinout
     default_tool: vivado
     tools:
       vivado:

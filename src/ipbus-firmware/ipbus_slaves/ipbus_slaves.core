@@ -5,19 +5,18 @@ description: IPbus slaves
 filesets:
   rtl:
     files:
-      - ipbus_reg_types.vhd:
-          is_include_fiue: true
-      - ipbus_reg_types_new.vhd:
-           is_include_fiue: true
-      - drp_decl.vhd:
-          is_include_fiue: true
-      - ipbus_drp_bridge.vhd
+      - ipbus_reg_types.vhd
+      - ipbus_reg_types_new.vhd
+      - drp_decl.vhd
+      - ipbus_drp_bridge.vhd:
+          file_type: vhdlSource-2008
       - syncreg_r.vhd
       - syncreg_w.vhd
       - freq_ctr_div.vhd
       - ipbus_ctrlreg_v.vhd
       - ipbus_freq_ctr.vhd
       - ipbus_reg_v.vhd
+      - ipbus_syncreg_v.vhd
     file_type: vhdlSource-93
 
 targets:

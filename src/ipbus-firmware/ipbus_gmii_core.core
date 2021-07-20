@@ -5,15 +5,13 @@ description: The firmware of IPbus GMII interface core.
 filesets:
   rtl:
     files:
-      - ipbus_util/clocks/clocks_7s_extphy.vhd
-      - ipbus_util/master/ipbus_ctrl.vhd
-      - ipbus_util/led_stretcher.vhd
       - ipbus_gmii_infra.vhd
     file_type: vhdlSource
     depend:
       - ::ipbus_eth
       - ::ipbus_core
       - ::ipbus_slaves
+      - ::ipbus_util
       - ::ipbus_transport_udp
 
 targets:

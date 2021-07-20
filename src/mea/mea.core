@@ -6,8 +6,9 @@ filesets:
   rtl:
     files:
       - mea_scan.vhd
-      - mea_clocks.vhd
-      - gen_clk100_en.vhd
+    #  - mea_clocks.vhd
+      - gen_clocks.vhd
+      - mea_clk_div.vhd
       - Pixel_MEA.v:
           file_type: verilogSource
     file_type: vhdlSource-2008
