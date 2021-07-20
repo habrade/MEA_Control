@@ -6,6 +6,17 @@
 - src: the source files of firmware
 - ipcores: Firmware IP cores 
 
+
+#### Fusesoc usage
+1. Create project
+``` bash
+make project
+```
+2. Build project
+``` bash
+make build
+```
+
 #### Test Platform
 The readout system is developed and tested on:
 - Ubuntu 20.04 LTS
